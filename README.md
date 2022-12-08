@@ -20,3 +20,5 @@
 - https://github.com/rodolfoHOk/fullcycle.imersao11-consolidacao
 - https://github.com/rodolfoHOk/fullcycle.imersao11-django
 - https://github.com/rodolfoHOk/fullcycle.imersao11-next
+
+1:08:31
