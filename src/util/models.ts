@@ -15,3 +15,31 @@ export const PlayersMap: { [key: string]: string } = {
   Richarlison: "/img/players/Richarlison.png",
   "Vinicius Junior": "/img/players/Vinicius Junior.png",
 };
+
+export type Action = {
+  player_name: string;
+  minutes: number;
+  action: "goal" | "yellow card" | "red card" | "assist";
+  score: number;
+};
+
+export type Match = {
+  id: string;
+  match_date: string;
+  team_a: string;
+  team_b: string;
+  result: string;
+  score?: number;
+  actions: Action[];
+};
+
+export const TeamsImagesMap: { [key: string]: string } = {
+  Alemanha: "/img/flags/Alemanha.png",
+  Argentina: "/img/flags/Argentina.png",
+  Bélgica: "/img/flags/Belgica.png",
+  Brasil: "/img/flags/Brasil.png",
+  França: "/img/flags/Franca.png",
+  Inglaterra: "/img/flags/Inglaterra.png",
+  Polônia: "/img/flags/Polonia.png",
+  Portugal: "/img/flags/Portugal.png",
+};
