@@ -1,6 +1,6 @@
 # Imersão Fullstack & FullCycle 11 - Cartola FullCycle
 
-> Microsserviço Django
+> Microsserviço Next Js
 
 ## Principais Tecnologias
 
@@ -21,5 +21,3 @@
 - https://github.com/rodolfoHOk/fullcycle.imersao11-consolidacao
 - https://github.com/rodolfoHOk/fullcycle.imersao11-django
 - https://github.com/rodolfoHOk/fullcycle.imersao11-next
-
-1:08:31
