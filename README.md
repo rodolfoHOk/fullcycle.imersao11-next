@@ -6,6 +6,7 @@
 
 - Typescript
 - NextJs / ReactJs
+- Material UI
 
 ### Bibliotecas adicionais
 

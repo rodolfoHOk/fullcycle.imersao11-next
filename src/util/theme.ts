@@ -16,11 +16,11 @@ export const theme = createTheme({
     secondary: {
       main: "#0E4987",
     },
-    divider: "#1B73A7",
     background: {
-      default: "#09345e",
+      default: "#09345E",
       paper: "#0E4987",
     },
+    divider: "#1B73A7",
     mode: "dark",
   },
   components: {
@@ -39,6 +39,15 @@ export const theme = createTheme({
           BackgroundSize: "cover",
           MozBackgroundSize: "cover",
         },
+      },
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: ({ theme, ownerState }) => ({
+          ...(ownerState.variant === "outlined" && {
+            border: `3px solid ${theme.palette.divider}`,
+          }),
+        }),
       },
     },
   },
