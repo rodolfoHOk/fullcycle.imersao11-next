@@ -10,7 +10,7 @@
 
 ### Bibliotecas adicionais
 
--
+- axios
 
 ## Guia
 

@@ -22,6 +22,7 @@ import { Page } from "../components/Page";
 import { Section } from "../components/Section";
 import { TeamLogo } from "../components/TeamLogo";
 import { Player, PlayersMap } from "../util/models";
+import { httpAdmin } from "../util/http";
 
 const players = [
   {
@@ -129,6 +130,15 @@ const ListPlayersPage: NextPage = () => {
       return newPlayers;
     });
   }, []);
+
+  const saveMyPlayers = useCallback(async () => {
+    await httpAdmin.put(
+      "/my-teams/22087246-01bc-46ad-a9d9-a99a6d734167/players",
+      {
+        players_uuid: playersSelected.map((player) => player.id),
+      }
+    );
+  }, [playersSelected]);
 
   return (
     <Page>
@@ -274,6 +284,7 @@ const ListPlayersPage: NextPage = () => {
             variant="contained"
             size="large"
             disabled={countPlayersUsed < totalPlayers || budgetRemaining < 0}
+            onClick={() => saveMyPlayers()}
           >
             Salvar
           </Button>
