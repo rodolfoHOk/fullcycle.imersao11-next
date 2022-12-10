@@ -1,5 +1,6 @@
 import { Box, styled, Typography } from "@mui/material";
 import Image from "next/image";
+import { format, parseISO } from "date-fns";
 import { Match, TeamsImagesMap } from "../util/models";
 
 type FlagProps = {
@@ -57,11 +58,11 @@ export const MatchResult = (props: MatchResultProps) => {
         <ResultItem width={"100px"} justifyContent="center" position="relative">
           <Box sx={{ position: "absolute", top: 0 }}>
             <Typography sx={{ fontSize: "0.70rem" }}>
-              {match.match_date}
+              {format(parseISO(match.match_date), "dd/MM/yyyy HH:mm")}
             </Typography>
           </Box>
           <Typography variant="h6" sx={{ fontWeight: "900" }}>
-            {match.result}
+            {match.result.split("-").join(" - ")}
           </Typography>
         </ResultItem>
 

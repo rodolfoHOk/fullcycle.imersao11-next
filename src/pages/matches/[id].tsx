@@ -19,6 +19,8 @@ import { Section } from "../../components/Section";
 import { useRouter } from "next/router";
 import { Match } from "../../util/models";
 import { green } from "@mui/material/colors";
+import { useHttp } from "../../hooks/useHttp";
+import { fetcherStats } from "../../util/http";
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&>td": {
@@ -70,134 +72,120 @@ function formatAction(playerName: string, action: string) {
   }
 }
 
-const match: Match = {
-  id: "1",
-  match_date: "12/12/2022 12:00",
-  team_a: "Brasil",
-  team_b: "Argentina",
-  result: "1-0",
-  score: 5,
-  actions: [
-    {
-      player_name: "Neymar",
-      action: "goal",
-      minutes: 10,
-      score: 5,
-    },
-    {
-      player_name: "Messi",
-      action: "yellow card",
-      minutes: 18,
-      score: -1,
-    },
-  ],
-};
-
 const MatchPage: NextPage = () => {
   const router = useRouter();
 
+  const { id: matchId } = router.query;
+  const { data: match } = useHttp<Match>(
+    matchId ? `/matches/${matchId}` : null,
+    fetcherStats,
+    { refreshInterval: 5000 }
+  );
+
   return (
     <Page>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: (theme) => theme.spacing(3),
-        }}
-      >
-        <MatchResult match={match} />
-
-        <Section
+      {match && (
+        <Box
           sx={{
-            marginTop: "-30px",
-            zIndex: -10,
-            width: 750,
-            position: "relative",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: (theme) => theme.spacing(3),
           }}
         >
-          <Table sx={{ minWidth: 650 }} aria-label="simple table">
-            <StyledTableHead>
-              <TableRow>
-                <TableCell>
-                  <HeadCellContent>
-                    <HeadImage src="/img/time.svg" alt="" />
-                    Tempo de jogo
-                  </HeadCellContent>
-                </TableCell>
+          <MatchResult match={match} />
 
-                <TableCell>
-                  <HeadCellContent>
-                    <HeadImage src="/img/player.svg" alt="" /> Jogador
-                  </HeadCellContent>
-                </TableCell>
+          <Section
+            sx={{
+              marginTop: "-30px",
+              zIndex: -10,
+              width: 750,
+              position: "relative",
+            }}
+          >
+            <Table sx={{ minWidth: 650 }} aria-label="simple table">
+              <StyledTableHead>
+                <TableRow>
+                  <TableCell>
+                    <HeadCellContent>
+                      <HeadImage src="/img/time.svg" alt="" />
+                      Tempo de jogo
+                    </HeadCellContent>
+                  </TableCell>
 
-                <TableCell>
-                  <HeadCellContent>
-                    <HeadImage src="/img/score.svg" alt="" /> Pontuação
-                  </HeadCellContent>
-                </TableCell>
-              </TableRow>
-            </StyledTableHead>
+                  <TableCell>
+                    <HeadCellContent>
+                      <HeadImage src="/img/player.svg" alt="" /> Jogador
+                    </HeadCellContent>
+                  </TableCell>
 
-            <TableBody>
-              {match.actions?.map((action, key) => (
-                <StyledTableRow key={key}>
-                  <StyledTableCell>{action.minutes}&#39;</StyledTableCell>
+                  <TableCell>
+                    <HeadCellContent>
+                      <HeadImage src="/img/score.svg" alt="" /> Pontuação
+                    </HeadCellContent>
+                  </TableCell>
+                </TableRow>
+              </StyledTableHead>
 
-                  <StyledTableCell>
-                    {formatAction(action.player_name, action.action)}
-                  </StyledTableCell>
+              <TableBody>
+                {match.actions?.map((action, key) => (
+                  <StyledTableRow key={key}>
+                    <StyledTableCell>{action.minutes}&#39;</StyledTableCell>
 
-                  <StyledTableCell
+                    <StyledTableCell>
+                      {formatAction(action.player_name, action.action)}
+                    </StyledTableCell>
+
+                    <StyledTableCell
+                      sx={{
+                        color: (theme) =>
+                          action.score > 0
+                            ? green[500]
+                            : theme.palette.primary.main,
+                      }}
+                    >
+                      <Typography>{action.score} pts</Typography>
+                    </StyledTableCell>
+                  </StyledTableRow>
+                ))}
+              </TableBody>
+            </Table>
+
+            <Chip
+              label={
+                <Box>
+                  <Typography component="span">Total do jogo: </Typography>
+                  <Typography
+                    component="span"
                     sx={{
+                      fontWeight: "bold",
                       color: (theme) =>
-                        action.score > 0
-                          ? green[500]
-                          : theme.palette.primary.main,
+                        1 > 0 ? green[500] : theme.palette.primary.main,
                     }}
                   >
-                    <Typography>{action.score} pts</Typography>
-                  </StyledTableCell>
-                </StyledTableRow>
-              ))}
-            </TableBody>
-          </Table>
+                    -- pts
+                  </Typography>
+                </Box>
+              }
+              sx={{
+                bottom: -15,
+                position: "absolute",
+                right: 15,
+                backgroundColor: (theme) => theme.palette.background.default,
+              }}
+            />
+          </Section>
 
-          <Chip
-            label={
-              <Box>
-                <Typography component="span">Total do jogo: </Typography>
-                <Typography
-                  component="span"
-                  sx={{
-                    fontWeight: "bold",
-                    color: (theme) =>
-                      1 > 0 ? green[500] : theme.palette.primary.main,
-                  }}
-                >
-                  -- pts
-                </Typography>
-              </Box>
-            }
-            sx={{
-              bottom: -15,
-              position: "absolute",
-              right: 15,
-              backgroundColor: (theme) => theme.palette.background.default,
-            }}
-          />
-        </Section>
-
-        <Button
-          variant="contained"
-          size="large"
-          startIcon={<ArrowBackIcon />}
-          onClick={() => router.back()}
-        >
-          Voltar
-        </Button>
-      </Box>
+          <Button
+            variant="contained"
+            size="large"
+            startIcon={<ArrowBackIcon />}
+            onClick={() => router.back()}
+          >
+            Voltar
+          </Button>
+        </Box>
+      )}
     </Page>
   );
 };

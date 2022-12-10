@@ -1,9 +1,18 @@
 import { Box } from "@mui/material";
 import { NextPage } from "next";
+import { useRouter } from "next/router";
 import { MatchResult } from "../../components/MatchResult";
 import { Page } from "../../components/Page";
+import { useHttp } from "../../hooks/useHttp";
+import { fetcherStats } from "../../util/http";
+import { Match } from "../../util/models";
 
 const ListMatchesPage: NextPage = () => {
+  const router = useRouter();
+  const { data: matches } = useHttp<Match[]>("/matches", fetcherStats, {
+    refreshInterval: 5000,
+  });
+
   return (
     <Page>
       <Box
@@ -14,38 +23,15 @@ const ListMatchesPage: NextPage = () => {
           gap: (theme) => theme.spacing(3),
         }}
       >
-        <MatchResult
-          match={{
-            id: "1",
-            match_date: "12/12/2022 12:00",
-            team_a: "Brasil",
-            team_b: "Argentina",
-            result: "1-0",
-            actions: [],
-          }}
-        />
-
-        <MatchResult
-          match={{
-            id: "1",
-            match_date: "12/12/2022 12:00",
-            team_a: "Brasil",
-            team_b: "Argentina",
-            result: "1-0",
-            actions: [],
-          }}
-        />
-
-        <MatchResult
-          match={{
-            id: "1",
-            match_date: "12/12/2022 12:00",
-            team_a: "Brasil",
-            team_b: "Argentina",
-            result: "1-0",
-            actions: [],
-          }}
-        />
+        {matches?.map((match, key) => (
+          <Box
+            key={key}
+            sx={{ cursor: "pointer" }}
+            onClick={() => router.push(`/matches/${match.id}`)}
+          >
+            <MatchResult match={match} />
+          </Box>
+        ))}
       </Box>
     </Page>
   );

@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import { NextPage } from "next";
 import Image from "next/image";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PersonIcon from "@mui/icons-material/Person2";
 import { Label } from "../components/Label";
@@ -22,55 +22,8 @@ import { Page } from "../components/Page";
 import { Section } from "../components/Section";
 import { TeamLogo } from "../components/TeamLogo";
 import { Player, PlayersMap } from "../util/models";
-import { httpAdmin } from "../util/http";
-
-const players = [
-  {
-    id: "64fb9c2f-a45b-4f96-9d8b-b127878ca6f3",
-    name: "Messi",
-    price: 35,
-  },
-  {
-    id: "4876d14f-d998-4abf-96ef-89fd53185464",
-    name: "Cristiano Ronaldo",
-    price: 35,
-  },
-  {
-    id: "0f463bea-1dbd-4765-b080-9f5f170b6ded",
-    name: "Neymar",
-    price: 25,
-  },
-  {
-    id: "c707bfa9-074e-4636-8772-633e4b56248d",
-    name: "Vinicius Junior",
-    price: 25,
-  },
-  {
-    id: "5",
-    name: "De Bruyne",
-    price: 15,
-  },
-  {
-    id: "6",
-    name: "Lewandowski",
-    price: 15,
-  },
-  {
-    id: "7",
-    name: "Maguirre",
-    price: 15,
-  },
-  {
-    id: "8",
-    name: "Richarlison",
-    price: 15,
-  },
-  {
-    id: "9",
-    name: "Harry Kane",
-    price: 15,
-  },
-];
+import { fetcherStats, httpAdmin } from "../util/http";
+import { useHttp } from "../hooks/useHttp";
 
 const fakePlayer = {
   id: "",
@@ -89,9 +42,22 @@ const fakePlayers: Player[] = new Array(totalPlayers)
   .fill(0)
   .map((_, key) => makeFakePlayer(key));
 
-const balance = 300;
-
 const ListPlayersPage: NextPage = () => {
+  const { data: balanceData } = useHttp(
+    "/my-teams/22087246-01bc-46ad-a9d9-a99a6d734167/balance",
+    fetcherStats,
+    { refreshInterval: 5000 }
+  );
+
+  const { data: players } = useHttp<Player[]>("/players", fetcherStats, {
+    fallbackData: [],
+  });
+
+  const { data: myPlayers } = useHttp(
+    "/my-teams/22087246-01bc-46ad-a9d9-a99a6d734167/players",
+    fetcherStats
+  );
+
   const [playersSelected, setPlayersSelected] = useState(fakePlayers);
 
   const countPlayersUsed = useMemo(
@@ -101,8 +67,11 @@ const ListPlayersPage: NextPage = () => {
 
   const budgetRemaining = useMemo(
     () =>
-      balance - playersSelected.reduce((acc, player) => acc + player.price, 0),
-    [playersSelected]
+      balanceData
+        ? balanceData.balance -
+          playersSelected.reduce((acc, player) => acc + player.price, 0)
+        : 0,
+    [playersSelected, balanceData]
   );
 
   const addPlayer = useCallback((player: Player) => {
@@ -139,6 +108,17 @@ const ListPlayersPage: NextPage = () => {
       }
     );
   }, [playersSelected]);
+
+  useEffect(() => {
+    if (!myPlayers) {
+      return;
+    }
+
+    setPlayersSelected((prev) => [
+      ...myPlayers,
+      ...prev.slice(myPlayers.length),
+    ]);
+  }, [myPlayers]);
 
   return (
     <Page>
@@ -188,7 +168,7 @@ const ListPlayersPage: NextPage = () => {
                       .includes(value.name.toLowerCase());
                   }}
                   getOptionLabel={(option) => option.name}
-                  options={players}
+                  options={players!}
                   onChange={(_event, newValue) => {
                     if (!newValue) {
                       return;
@@ -295,3 +275,14 @@ const ListPlayersPage: NextPage = () => {
 };
 
 export default ListPlayersPage;
+
+// export const getServerSideProps : GetServerSideProps = async (context: GetServerSidePropsContext) => {
+//   //api para pegar os players com o axios
+//   //httpStats.get("/players")
+//   return {
+//     props: {
+//       players,
+//       myPlayers
+//     }
+//   }
+// }

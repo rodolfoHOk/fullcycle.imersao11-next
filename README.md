@@ -11,6 +11,8 @@
 ### Bibliotecas adicionais
 
 - axios
+- swr
+- date-fns
 
 ## Guia
 
